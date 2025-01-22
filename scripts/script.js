@@ -1,4 +1,4 @@
-var clients = [
+let clients = [
     {
         firstName: 'Александр',
         lastName: 'Иванчук',
@@ -36,4 +36,137 @@ var clients = [
     },
 ]
 
-console.log(clients)
+let bestClients = [
+    {
+        firstName: 'Рэйчел',
+        lastName: 'Грин',
+        date: '05-05-1970',
+        phone: '8 (929) 988-90-09',
+        amounts: [1100, 1200, 1300, 1400]
+    },
+    {
+        firstName: 'Моника',
+        lastName: 'Геллер',
+        date: '04-22-1969',
+        phone: null,
+        amounts: [500, 8000, 800]
+    },
+    {
+        firstName: 'Чендлер',
+        lastName: 'Бинг',
+        date: '01-22-1968',
+        phone: '8 (899) 546-09-08',
+        amounts: []
+    },
+    {
+        firstName: 'Джо',
+        lastName: 'Трибиани',
+        date: '01-09-1968',
+        phone: '8 (899) 546-09-08',
+        amounts: [500, 8000, 800]
+    },
+]
+
+
+// Часть 1
+function getUserInput(text) {
+    let result = prompt(text)
+    return result ? result : null
+}
+
+
+let newClient = {
+    firstName: getUserInput('Ваше имя?'),
+    lastName: getUserInput('Ваша фамилия?'),
+    date: getUserInput('Ваша дата рождения (мм-дд-гггг)?'),
+    phone: getUserInput('Ваш телефон?'),
+    amounts: [],
+}
+
+while (true) {
+    if (!confirm(`Добавить покупку для клиента ${getFullName(newClient)}?`)) {
+        break
+    }
+    let amount = +getUserInput('Введите сумму покупки')
+    if (amount) {
+        newClient.amounts.push(amount)
+    }
+}
+
+clients.push(newClient)
+
+
+// Часть 2
+function getFullName(client) {
+    return (client.firstName ?? '') + ' ' + (client.lastName ?? '')
+}
+
+
+function getBirthDay(date_str) {
+    let date = new Date(date_str)
+    let dateNow = new Date()
+    let suffix = date.getDate() === dateNow.getDate() && date.getMonth() === dateNow.getMonth() ? ' (сегодня)' : ''
+    return date.toLocaleString('ru-RU', {day: 'numeric', 'month': 'long'}) + suffix
+}
+
+function getAllAmount(numbers) {
+    let sum = 0
+    numbers.forEach((num) => {sum += num})
+    return sum
+}
+
+
+function getAverageAmount(numbers) {
+    let result = numbers.length !== 0 ? getAllAmount(numbers) / numbers.length : 0
+    return result.toFixed(1)
+}
+
+
+function whoSpentMore(clients) {
+    let max = 0
+    let buyers = []
+    for (let client of clients) {
+        let allAmount = getAllAmount(client.amounts)
+        let clientName = getFullName(client)
+
+        if (allAmount > max) {
+            buyers = [clientName]
+            max = allAmount
+        } else if (allAmount === max && allAmount !== 0) {
+            buyers.push(clientName)
+        }
+    }
+
+    let msg
+    if (buyers.length === 0) {
+        msg = 'Никто ничего не потратил'
+    } else if (buyers.length === 1) {
+        msg = `Больше всех потратил ${buyers[0]}. Сумма покупок: ${max}`
+    } else {
+        msg = `Больше всех потратили: ${buyers.join(', ')}. Сумма покупок: ${max}`
+    }
+    console.log(msg)
+}
+
+
+let showClients = (clients) => {
+    for (let client of clients) {
+        let clientName = getFullName(client)
+        let avgAmount = getAverageAmount(client.amounts)
+        let birthDay = getBirthDay(client.date)
+        alert(`Клиент ${clientName} имеет среднюю сумму чека ${avgAmount}. День рождения клиента: ${birthDay}`)
+    }
+}
+
+try {
+    showClients(clients)
+} catch(error) {
+    console.log('Вызвана функция без параметров')
+    console.log(error.message)
+}
+whoSpentMore(clients)
+
+setTimeout(() => {
+    showClients(bestClients)
+    whoSpentMore(bestClients)
+}, 3000)
